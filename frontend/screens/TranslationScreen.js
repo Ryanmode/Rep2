@@ -1,7 +1,7 @@
 // Translation Screen - Handles text summarization, translation, and TTS
 // This is a placeholder - can be expanded later
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,13 +14,39 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ApiService from '../components/ApiService';
+import AudioPlayer from '../components/AudioPlayer';
 
 export default function TranslationScreen({ route }) {
   const [inputText, setInputText] = useState('');
   const [summary, setSummary] = useState('');
   const [translation, setTranslation] = useState('');
+  const [audioUrl, setAudioUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('Spanish');
+
+  // Check for navigation parameters on component mount
+  useEffect(() => {
+    if (route.params?.transcript) {
+      setInputText(route.params.transcript);
+    }
+  }, [route.params]);
+
+  const getScreenTitle = () => {
+    if (route.params?.episodeTitle) {
+      return `Translating: ${route.params.episodeTitle}`;
+    }
+    if (route.params?.podcastTitle) {
+      return `From: ${route.params.podcastTitle}`;
+    }
+    return 'Translation & Audio';
+  };
+
+  const getScreenSubtitle = () => {
+    if (route.params?.episodeTitle) {
+      return 'Episode transcript loaded automatically';
+    }
+    return 'Translate and listen to content';
+  };
 
   const handleTranslate = async () => {
     if (!inputText.trim()) {
@@ -36,6 +62,8 @@ export default function TranslationScreen({ route }) {
       );
       setSummary(response.summary);
       setTranslation(response.translation);
+      // Clear any previous audio when new translation is made
+      setAudioUrl(null);
     } catch (error) {
       console.error('Translation error:', error);
       Alert.alert('Error', 'Failed to translate text');
@@ -56,16 +84,19 @@ export default function TranslationScreen({ route }) {
         voice: 'podcast-narrator-female',
         language: selectedLanguage.toLowerCase(),
         quality: 'podcast',
-        title: 'Rapidlu Translated Content',
+        title: route.params?.episodeTitle || 'Rapidlu Translated Content',
         description: `AI-translated podcast content in ${selectedLanguage}`
       });
       
+      // Store the audio URL for playback
+      setAudioUrl(response.audio?.audioUrl || response.audioUrl);
+      
       Alert.alert(
         'Podcast Audio Generated!', 
-        `✅ Successfully created ${Math.round(response.generation.estimated_listen_time / 60)} minute podcast\n\n` +
-        `🎤 Voice: ${response.generation.voice_used}\n` +
-        `📊 Quality: ${response.audio.quality}\n` +
-        `⚡ Provider: ${response.audio.provider}`
+        `✅ Successfully created ${Math.round((response.generation?.estimated_listen_time || 120) / 60)} minute podcast\n\n` +
+        `🎤 Voice: ${response.generation?.voice_used || 'Default'}\n` +
+        `📊 Quality: ${response.audio?.quality || 'podcast'}\n` +
+        `⚡ Provider: ${response.audio?.provider || 'mock'}`
       );
     } catch (error) {
       console.error('Podcast TTS error:', error);
@@ -78,14 +109,16 @@ export default function TranslationScreen({ route }) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Translation & Audio</Text>
+        <Text style={styles.headerTitle}>{getScreenTitle()}</Text>
         <Text style={styles.headerSubtitle}>
-          Translate and listen to content
+          {getScreenSubtitle()}
         </Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Input Text</Text>
+        <Text style={styles.sectionTitle}>
+          {route.params?.transcript ? 'Episode Transcript' : 'Input Text'}
+        </Text>
         <TextInput
           style={styles.textInput}
           placeholder="Paste podcast transcript or any text here..."
@@ -136,6 +169,17 @@ export default function TranslationScreen({ route }) {
                 {loading ? 'Creating Podcast...' : 'Generate Podcast Audio'}
               </Text>
             </TouchableOpacity>
+
+            {/* Audio Player will be rendered here after we create it */}
+            {audioUrl && (
+              <View style={styles.audioPlayerSection}>
+                <Text style={styles.sectionTitle}>Listen to Translation</Text>
+                <AudioPlayer 
+                  audioUrl={audioUrl}
+                  title={route.params?.episodeTitle || 'Translated Audio'}
+                />
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -219,5 +263,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#374151',
     lineHeight: 24,
+  },
+  audioPlayerSection: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
   },
 }); 
