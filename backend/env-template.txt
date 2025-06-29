@@ -1,0 +1,25 @@
+# Copy this file to .env and fill in your actual API keys
+
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# OpenAI API (for summarization and translation)
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Text-to-Speech API Keys (choose one)
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+PLAYHT_API_KEY=your_playht_api_key_here
+PLAYHT_USER_ID=your_playht_user_id_here
+
+# AutoContent API (for podcast-quality TTS)
+AUTOCONTENT_API_KEY=your_autocontent_api_key_here
+AUTOCONTENT_BASE_URL=https://api.autocontent.ai/v1
+
+# Podcast API Keys (examples - use what you find)
+LISTEN_NOTES_API_KEY=your_listen_notes_api_key_here
+SPOTIFY_CLIENT_ID=your_spotify_client_id_here
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
+
+# CORS Settings (frontend URL)
+FRONTEND_URL=http://localhost:8081 
