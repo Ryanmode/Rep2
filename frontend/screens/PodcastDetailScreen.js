@@ -127,7 +127,7 @@ export default function PodcastDetailScreen({ route, navigation }) {
             <FlatList
               data={episodes}
               renderItem={renderEpisode}
-              keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+              keyExtractor={(item) => item.id}
               scrollEnabled={false}
               showsVerticalScrollIndicator={false}
             />

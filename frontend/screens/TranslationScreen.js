@@ -21,7 +21,8 @@ export default function TranslationScreen({ route }) {
   const [summary, setSummary] = useState('');
   const [translation, setTranslation] = useState('');
   const [audioUrl, setAudioUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('Spanish');
 
   // Check for navigation parameters on component mount
@@ -55,7 +56,7 @@ export default function TranslationScreen({ route }) {
     }
 
     try {
-      setLoading(true);
+      setIsTranslating(true);
       const response = await ApiService.summarizeAndTranslate(
         inputText,
         selectedLanguage
@@ -68,7 +69,7 @@ export default function TranslationScreen({ route }) {
       console.error('Translation error:', error);
       Alert.alert('Error', 'Failed to translate text');
     } finally {
-      setLoading(false);
+      setIsTranslating(false);
     }
   };
 
@@ -79,7 +80,7 @@ export default function TranslationScreen({ route }) {
     }
 
     try {
-      setLoading(true);
+      setIsGeneratingAudio(true);
       const response = await ApiService.generatePodcastAudio(translation, {
         voice: 'podcast-narrator-female',
         language: selectedLanguage.toLowerCase(),
@@ -102,7 +103,7 @@ export default function TranslationScreen({ route }) {
       console.error('Podcast TTS error:', error);
       Alert.alert('Error', 'Failed to generate podcast audio');
     } finally {
-      setLoading(false);
+      setIsGeneratingAudio(false);
     }
   };
 
@@ -131,15 +132,15 @@ export default function TranslationScreen({ route }) {
         <TouchableOpacity
           style={styles.translateButton}
           onPress={handleTranslate}
-          disabled={loading}
+          disabled={isTranslating || isGeneratingAudio}
         >
-          {loading ? (
+          {isTranslating ? (
             <ActivityIndicator color="white" />
           ) : (
             <Ionicons name="language" size={24} color="white" />
           )}
           <Text style={styles.buttonText}>
-            {loading ? 'Processing...' : 'Summarize & Translate'}
+            {isTranslating ? 'Processing...' : 'Summarize & Translate'}
           </Text>
         </TouchableOpacity>
 
@@ -158,15 +159,15 @@ export default function TranslationScreen({ route }) {
             <TouchableOpacity
               style={styles.audioButton}
               onPress={handleGenerateAudio}
-              disabled={loading}
+              disabled={isTranslating || isGeneratingAudio}
             >
-              {loading ? (
+              {isGeneratingAudio ? (
                 <ActivityIndicator color="white" />
               ) : (
                 <Ionicons name="mic" size={24} color="white" />
               )}
               <Text style={styles.buttonText}>
-                {loading ? 'Creating Podcast...' : 'Generate Podcast Audio'}
+                {isGeneratingAudio ? 'Creating Podcast...' : 'Generate Podcast Audio'}
               </Text>
             </TouchableOpacity>
 

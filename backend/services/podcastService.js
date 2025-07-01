@@ -14,7 +14,7 @@ class PodcastService {
   async searchPodcasts(query, limit = 10) {
     try {
       if (!this.listenNotesApiKey) {
-        // Mock data for testing without API key
+        console.warn('Listen Notes API key not found. Returning mock data.');
         return this.getMockPodcastSearch(query, limit);
       }
 
@@ -56,6 +56,7 @@ class PodcastService {
   async getPodcastById(id) {
     try {
       if (!this.listenNotesApiKey) {
+        console.warn('Listen Notes API key not found. Returning mock data.');
         return this.getMockPodcastDetails(id);
       }
 
