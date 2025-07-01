@@ -15,6 +15,14 @@ import PodcastDetailScreen from './screens/PodcastDetailScreen';
 import TranslationScreen from './screens/TranslationScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
+// Import authentication screens
+import LandingScreen from './screens/LandingScreen';
+import LoginScreen from './screens/LoginScreen';
+import SignUpScreen from './screens/SignUpScreen';
+import CreatePasswordScreen from './screens/CreatePasswordScreen';
+import ProfileSetupScreen from './screens/ProfileSetupScreen';
+import PasswordLoginScreen from './screens/PasswordLoginScreen';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -71,6 +79,10 @@ function MainTabs() {
         },
         tabBarActiveTintColor: '#6366f1',
         tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          backgroundColor: '#000000',
+          borderTopColor: '#333333',
+        },
         headerShown: false,
       })}
     >
@@ -93,12 +105,34 @@ function MainTabs() {
   );
 }
 
+// Root stack navigator for authentication and main app
+function RootStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      {/* Authentication Flow */}
+      <Stack.Screen name="Landing" component={LandingScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen name="CreatePassword" component={CreatePasswordScreen} />
+      <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+      <Stack.Screen name="PasswordLogin" component={PasswordLoginScreen} />
+      
+      {/* Main App */}
+      <Stack.Screen name="MainApp" component={MainTabs} />
+    </Stack.Navigator>
+  );
+}
+
 // Main App component
 export default function App() {
   return (
     <NavigationContainer>
-      <StatusBar style="light" backgroundColor="#6366f1" />
-      <MainTabs />
+      <StatusBar style="light" backgroundColor="#12211a" />
+      <RootStack />
     </NavigationContainer>
   );
 } 
